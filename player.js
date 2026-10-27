@@ -8,6 +8,7 @@
 
   var STATE_KEY = 'playlist_state';   // { id, time } pra retomar ao voltar de uma música
   var PAUSED_KEY = 'playlist_paused'; // pausou de propósito: não volta a tocar sozinho nesta sessão
+  var VOLUME_KEY = 'playlist_volume'; // { v, muted } — guardado entre visitas
 
   var queue = [];
   var index = 0;
@@ -55,6 +56,10 @@
           '<div class="player-progress" role="slider" aria-label="Posição na música" tabindex="0"><div class="player-fill"></div></div>' +
         '</div>' +
         '<div class="player-time">0:00</div>' +
+        '<div class="player-vol">' +
+          '<button type="button" class="pl-mute" aria-label="Silenciar"></button>' +
+          '<input type="range" class="pl-vol" min="0" max="1" step="0.01" aria-label="Volume">' +
+        '</div>' +
       '</div>';
     document.body.appendChild(bar);
     document.body.classList.add('has-player');
@@ -64,6 +69,7 @@
     progressEl = bar.querySelector('.player-progress');
     fillEl = bar.querySelector('.player-fill');
     timeEl = bar.querySelector('.player-time');
+    setupVolume(bar.querySelector('.pl-mute'), bar.querySelector('.pl-vol'));
 
     playBtn.addEventListener('click', function () {
       if (audio.paused) { writeSession(PAUSED_KEY, null); play(); }
@@ -83,6 +89,42 @@
       if (e.key === 'ArrowRight') audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
       if (e.key === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 5);
     });
+  }
+
+  var SPEAKER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/>';
+  var ICON_VOL = SPEAKER + '<path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var ICON_LOW = SPEAKER + '<path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
+  var ICON_MUTE = SPEAKER + '<path d="m16 9 5 6"/><path d="m21 9-5 6"/></svg>';
+
+  // Volume e mudo ficam salvos no navegador, pra valer na próxima visita.
+  // (No iPhone o volume só muda pelos botões do aparelho; o mudo funciona.)
+  function setupVolume(muteBtn, slider) {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(VOLUME_KEY) || 'null'); } catch (e) {}
+    if (saved && typeof saved.v === 'number') audio.volume = Math.max(0, Math.min(1, saved.v));
+    audio.muted = !!(saved && saved.muted);
+
+    function paint() {
+      var shown = audio.muted ? 0 : audio.volume;
+      slider.value = String(shown);
+      slider.style.setProperty('--vol', (shown * 100) + '%');
+      muteBtn.innerHTML = shown === 0 ? ICON_MUTE : (shown < 0.5 ? ICON_LOW : ICON_VOL);
+      muteBtn.setAttribute('aria-label', audio.muted ? 'Tirar do mudo' : 'Silenciar');
+      try { localStorage.setItem(VOLUME_KEY, JSON.stringify({ v: audio.volume, muted: audio.muted })); } catch (e) {}
+    }
+    slider.addEventListener('input', function () {
+      var v = parseFloat(slider.value);
+      audio.volume = v;
+      audio.muted = v === 0;
+      paint();
+    });
+    muteBtn.addEventListener('click', function () {
+      // Tirar do mudo com o volume zerado volta pra metade, senão nada muda.
+      if (audio.muted && audio.volume === 0) audio.volume = 0.5;
+      audio.muted = !audio.muted;
+      paint();
+    });
+    paint();
   }
 
   function updateUi() {

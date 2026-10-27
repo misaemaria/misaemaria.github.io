@@ -371,3 +371,27 @@ body.sheet-open { overflow: hidden; }
   .sheet-panel { border-radius: 0; border-left: none; border-right: none; }
 }
 .sheet-back:focus-visible, .sheet-page:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; border-radius: 6px; }
+
+/* ---- volume da playlist ---- */
+.player-vol { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.pl-mute {
+  width: 34px; height: 34px; border: none; background: none; cursor: pointer; padding: 6px;
+  color: var(--fg); border-radius: 50%;
+}
+.pl-mute:hover { color: var(--yellow); }
+.pl-mute svg { width: 100%; height: 100%; display: block; }
+.pl-vol {
+  --vol: 100%;
+  -webkit-appearance: none; appearance: none; width: 96px; height: 6px; border-radius: 3px; cursor: pointer;
+  background: linear-gradient(to right, var(--cyan) 0 var(--vol), var(--surface-2) var(--vol) 100%);
+}
+.pl-vol::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--yellow); border: 2px solid var(--bg); box-shadow: 1px 1px 0 var(--magenta);
+}
+.pl-vol::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--yellow); border: 2px solid var(--bg); box-shadow: 1px 1px 0 var(--magenta);
+}
+.pl-vol:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; }
+@media (max-width: 720px) { .pl-vol { display: none; } }
