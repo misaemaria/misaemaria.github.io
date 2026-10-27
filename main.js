@@ -78,6 +78,13 @@
         '<div class="track-title">' + esc(song.nome || 'Sem título') + '</div>' +
       '</span>' +
       '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>';
+    // Abre a música numa janela por cima da lista, pra playlist não parar.
+    // Ctrl/Cmd/botão do meio continuam abrindo a página da música normalmente.
+    link.addEventListener('click', function (e) {
+      if (!window.SongSheet || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      window.SongSheet.open(song.id);
+    });
     wrap.appendChild(link);
 
     var favBtn = document.createElement('button');
@@ -112,6 +119,12 @@
 
   render();
   if (window.Playlist) window.Playlist.setQueue(songs, false);
+  if (window.SongSheet) {
+    window.SongSheet.init({
+      getSongs: function () { return songs; },
+      onFavChange: render
+    });
+  }
 
   // A playlist segue a mesma ordem da lista. Ela só começa depois que a
   // ordem por acessos chegar (ou falhar), pra abrir pela mais ouvida.

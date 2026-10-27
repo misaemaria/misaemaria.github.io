@@ -96,6 +96,8 @@
     playBtn.setAttribute('aria-label', audio.paused ? 'Tocar' : 'Pausar');
     bar.classList.toggle('waiting', audio.paused && !readSession(PAUSED_KEY));
     markList();
+    // Avisa quem mostra o estado da playlist fora da barra (a janela da música).
+    try { global.dispatchEvent(new CustomEvent('playlist:change')); } catch (e) {}
     if ('mediaSession' in navigator && global.MediaMetadata) {
       navigator.mediaSession.metadata = new MediaMetadata({ title: song.nome || '', artist: song.compositor || 'Misa & Maria', album: 'Arquivo Misa & Maria' });
     }
@@ -212,6 +214,15 @@
     markList: markList,
     pause: function () { audio.pause(); },
     isPlaying: function () { return !audio.paused; },
-    resume: function () { return play(); }
+    resume: function () { return play(); },
+    // Toca uma música específica (botão "Tocar" na janela da música).
+    playSong: function (id) {
+      var i = queue.findIndex(function (s) { return s.id === id; });
+      if (i === -1) return;
+      writeSession(PAUSED_KEY, null);
+      if (i === index && audio.src) { play(); return; }
+      go(i, true);
+    },
+    currentId: function () { var s = current(); return s ? s.id : null; }
   };
 })(window);
