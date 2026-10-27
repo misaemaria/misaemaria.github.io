@@ -104,6 +104,11 @@ def render_page(song: dict, prev_song: dict | None, next_song: dict | None) -> s
   <link rel="canonical" href="{safe_url}">
   <script type="application/ld+json">{schema_json}</script>
   <title>{meta_title} | Arquivo Misa & Maria</title>
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#1a1250">
   <link rel="stylesheet" href="../style.css?v=6">
 </head>
 <body>
