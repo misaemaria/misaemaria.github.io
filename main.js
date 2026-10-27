@@ -51,6 +51,7 @@
     filtered.forEach(function (song, idx) {
       listEl.appendChild(renderTrack(song, idx + 1));
     });
+    if (window.Playlist) window.Playlist.markList();
   }
 
   function slugifyText(value) {
@@ -64,6 +65,7 @@
 
     var wrap = document.createElement('div');
     wrap.className = 'track';
+    wrap.setAttribute('data-id', String(song.id));
 
     var link = document.createElement('a');
     link.className = 'track-link';
@@ -107,6 +109,15 @@
   });
 
   render();
+  if (window.Playlist) window.Playlist.setQueue(songs, false);
+
+  // A playlist segue a mesma ordem da lista. Ela só começa depois que a
+  // ordem por acessos chegar (ou falhar), pra abrir pela mais ouvida.
+  function finalizeQueue() {
+    if (window.Playlist) window.Playlist.setQueue(songs, true);
+  }
+  // Se o contador de acessos demorar, não segura a playlist pra sempre.
+  setTimeout(finalizeQueue, 4000);
 
   // Reordena por acessos assim que os números chegarem — até lá, fica na
   // ordem padrão (mais recente primeiro) pra não deixar a lista em branco.
@@ -120,6 +131,9 @@
         return (b.id || 0) - (a.id || 0);
       });
       render();
-    }).catch(function () {});
+      finalizeQueue();
+    }).catch(finalizeQueue);
+  } else {
+    finalizeQueue();
   }
 })();

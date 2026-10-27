@@ -86,6 +86,7 @@
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="tab-musicas">Músicas</button>
+    <button class="tab-btn" data-tab="tab-insta">Instagram</button>
     <button class="tab-btn" data-tab="tab-config">Configurações</button>
   </div>
 
@@ -97,6 +98,19 @@
     <div id="songList"></div>
   </div>
 
+  <div class="tab-panel" id="tab-insta">
+    <div class="panel-box">
+      <div class="field">
+        <label for="instaUrl">Link da postagem</label>
+        <input type="url" id="instaUrl" placeholder="https://www.instagram.com/p/…">
+      </div>
+      <p class="hint">Abre a postagem no Instagram, toca em "Partilhar" → "Copiar link" e cola aqui. Vale post, reel ou vídeo. A mais recente fica no topo da lateral.</p>
+      <div class="form-actions">
+        <button class="primary" id="instaAddBtn">+ Adicionar</button>
+      </div>
+    </div>
+    <div id="instaList"></div>
+  </div>
   <div class="tab-panel" id="tab-config">
     <div class="panel-box">
       <div class="field">
@@ -436,19 +450,20 @@
     songsSha = r.content.sha;
     // songs.js fica em cache até 10min no GitHub Pages — sem isto, quem
     // tinha a página aberta recentemente não veria a música nova a tempo.
-    bumpCacheVersion().catch(function () {});
+    bumpCacheVersion('songs.js').catch(function () {});
     return true;
   }
 
-  async function bumpCacheVersion() {
+  async function bumpCacheVersion(name) {
     var file = await ghGetFile('index.html');
     if (!file) return;
     var html = base64ToText(file.content);
-    var match = html.match(/songs\.js\?v=(\d+)/);
+    var escName = name.replace('.', '\\.');
+    var match = html.match(new RegExp(escName + '\\?v=(\\d+)'));
     var next = match ? (parseInt(match[1], 10) + 1) : 1;
-    var updated = html.replace(/songs\.js(\?v=\d+)?/, 'songs.js?v=' + next);
+    var updated = html.replace(new RegExp(escName + '(\\?v=\\d+)?'), name + '?v=' + next);
     if (updated === html) return;
-    await ghPutFile('index.html', textToBase64(updated), file.sha, 'chore: invalidar cache de songs.js (v' + next + ')');
+    await ghPutFile('index.html', textToBase64(updated), file.sha, 'chore: invalidar cache de ' + name + ' (v' + next + ')');
   }
 
   editForm.addEventListener('submit', async function (e) {
@@ -538,9 +553,97 @@
     return window.confirm(msg);
   }
 
+  // ---- Instagram ----
+  var insta = [];
+  var instaSha = null;
+
+  // Aceita link de post, reel ou vídeo (com ou sem @utilizador no caminho,
+  // com ?igsh=… no fim) e devolve a forma canónica que o embed entende.
+  function normalizeInstaUrl(raw) {
+    var m = String(raw || '').trim().match(/instagram\.com\/(?:[A-Za-z0-9_.]+\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
+    if (!m) return null;
+    var kind = m[1] === 'reels' ? 'reel' : m[1];
+    return 'https://www.instagram.com/' + kind + '/' + m[2] + '/';
+  }
+
+  async function loadInsta() {
+    var file = await ghGetFile('instagram.js');
+    if (!file) { setStatus('Falha ao carregar instagram.js: ' + lastGhError, 'err'); return; }
+    instaSha = file.sha;
+    var match = base64ToText(file.content).match(/window\.INSTAGRAM\s*=\s*(\[[\s\S]*\]);?/);
+    insta = match ? JSON.parse(match[1]) : [];
+    renderInsta();
+  }
+
+  function renderInsta() {
+    var el = document.getElementById('instaList');
+    if (!insta.length) {
+      el.innerHTML = '<p style="color:var(--muted)">Nenhuma postagem ainda. A lateral mostra só o link do perfil.</p>';
+      return;
+    }
+    el.innerHTML = '';
+    insta.forEach(function (url, i) {
+      var row = document.createElement('div');
+      row.className = 'song-row';
+      row.innerHTML =
+        '<div class="meta"><div class="n"></div><div class="c"></div></div>' +
+        '<div class="actions"><button class="up" title="Subir">↑</button><button class="down" title="Descer">↓</button><button class="danger del">Remover</button></div>';
+      var a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = url.replace('https://www.instagram.com/', '');
+      row.querySelector('.n').appendChild(a);
+      row.querySelector('.c').textContent = i === 0 ? 'No topo' : ('Posição ' + (i + 1));
+      row.querySelector('.up').disabled = i === 0;
+      row.querySelector('.down').disabled = i === insta.length - 1;
+      row.querySelector('.up').addEventListener('click', function () { moveInsta(i, -1); });
+      row.querySelector('.down').addEventListener('click', function () { moveInsta(i, 1); });
+      row.querySelector('.del').addEventListener('click', function () {
+        if (!confirmInline('Remover esta postagem da lateral?')) return;
+        var prev = insta.slice();
+        insta.splice(i, 1);
+        saveInsta('chore: remover postagem do Instagram', prev);
+      });
+      el.appendChild(row);
+    });
+  }
+
+  function moveInsta(i, dir) {
+    var j = i + dir;
+    if (j < 0 || j >= insta.length) return;
+    var prev = insta.slice();
+    var tmp = insta[i]; insta[i] = insta[j]; insta[j] = tmp;
+    saveInsta('chore: reordenar postagens do Instagram', prev);
+  }
+
+  async function saveInsta(message, prev) {
+    setStatus('A guardar…');
+    var js = 'window.INSTAGRAM = ' + JSON.stringify(insta, null, 2) + ';\n';
+    var r = await ghPutFile('instagram.js', textToBase64(js), instaSha, message);
+    if (!r) {
+      insta = prev;
+      renderInsta();
+      setStatus('Falha ao guardar: ' + lastGhError, 'err');
+      return;
+    }
+    instaSha = r.content.sha;
+    bumpCacheVersion('instagram.js').catch(function () {});
+    setStatus('Guardado. Aparece no site em 1–2 minutos.', 'ok');
+    renderInsta();
+  }
+
+  document.getElementById('instaAddBtn').addEventListener('click', function () {
+    var input = document.getElementById('instaUrl');
+    var url = normalizeInstaUrl(input.value);
+    if (!url) { setStatus('Link inválido. Usa o link de um post, reel ou vídeo do Instagram.', 'err'); return; }
+    if (insta.indexOf(url) !== -1) { setStatus('Essa postagem já está na lista.', 'err'); return; }
+    var prev = insta.slice();
+    insta.unshift(url);
+    input.value = '';
+    saveInsta('chore: adicionar postagem do Instagram', prev);
+  });
+
   function initApp() {
     loadConfig();
-    if (ghUser && ghRepo && ghToken) loadSongs();
+    if (ghUser && ghRepo && ghToken) { loadSongs(); loadInsta(); }
     else setStatus('Configura o GitHub na aba "Configurações" primeiro.', 'err');
   }
 })();

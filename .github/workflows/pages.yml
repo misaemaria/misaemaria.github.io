@@ -6,6 +6,9 @@ on:
       - master
       - main
   workflow_dispatch:
+  # Atualiza a lateral de vídeos (fetch_videos.py) uma vez por hora.
+  schedule:
+    - cron: '23 * * * *'
 
 permissions:
   contents: read
@@ -41,6 +44,9 @@ jobs:
 
       - name: Generate song pages
         run: python generate_song_pages.py
+
+      - name: Fetch latest YouTube videos
+        run: python fetch_videos.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
