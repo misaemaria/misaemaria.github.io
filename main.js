@@ -30,8 +30,10 @@
       return matches(s, q);
     });
 
+    // Sem busca nem filtro, só o total; com filtro, quantas sobraram do total.
+    var total = songs.length + ' música' + (songs.length === 1 ? '' : 's');
     countEl.textContent = songs.length === 0 ? '' :
-      (filtered.length + ' de ' + songs.length + ' música' + (songs.length === 1 ? '' : 's'));
+      (filtered.length === songs.length ? total : filtered.length + ' de ' + total);
 
     if (songs.length === 0) {
       listEl.innerHTML = '<div class="empty"><div class="ico">🎶</div><h3>Ainda sem músicas</h3>' +
