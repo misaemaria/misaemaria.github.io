@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://userm4c.github.io/misaemaria/sitemap.xml
+Sitemap: https://misaemaria.github.io/sitemap.xml
