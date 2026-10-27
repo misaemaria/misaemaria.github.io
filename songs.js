@@ -115,5 +115,14 @@ window.SONGS = [
     "videoFonte": "",
     "letra": "Ela tá molhadinha, sabe bem como é que é\nXoxó tá apertadinha, Xoxó tá de Noé\nEla tá molhadinha, sabe bem como é que é\nXoxó tá apertadinha, Xoxó tá de Noé\n\nEu subi essa montanha e já fiquei excitado\nTem um T-Rex vegano num formato delicado\nNão é que ela existe, essa arca tão perdida\nMas esse formato é foda de xavasca apertadinha\n\nEla tá molhadinha, sabe bem como é que é\nXoxó tá apertadinha, Xoxó tá de Noé\nEla tá molhadinha, sabe bem como é que é\nXoxó tá apertadinha, Xoxó tá de Noé\n\nEu subi essa montanha e já fiquei excitado\nTem um T-Rex vegano num formato delicado\nNão é que ela existe, essa arca tão perdida\nMas esse formato é foda de xavasca apertadinha",
     "audio": "assets/audio/13.mp3"
+  },
+  {
+    "id": 14,
+    "nome": "Rave Cristã (Remastered)",
+    "compositor": "",
+    "descricao": "[Por enquanto sem lore]",
+    "videoFonte": "",
+    "letra": "Que personagem da Bíblia você levaria para a festa das cores?\nEu levaria Pedro porque ele adora causar uma confusão\nAooh Calica... como eu estou solteiro, levaria Ester porque ela é muito linda, cara\nAooh Calica... acho que levaria Jesus porque ele ia aooh, dançar muito com a gente\nAooh Calica... Mirian, porque ela dançou na presença de aooh Calica...\nDavi, porque ele ia pegar aqui, balançar e jogar em todo mundo!\nAooh Calica...\n\nQue personagem da Bíblia você levaria para a festa das cores?\nEu levaria Pedro porque ele adora causar uma confusão\nAiooh Calica... \n\nComo eu estou solteiro, levaria Ester porque ela é muito linda, cara (ai ela é muito linda, cara!)\nAooh Calica... acho que levaria Jesus porque ele ia aooh, dançar muito com a gente (com a gente, com a gente)\nAooh Calica... Mirian, porque ela dançou na presença de... aaaaaooh Calica...\nDavi, porque ele ia pegar aqui, balançar e jogar em todo mundo!\nAi em todo mundo!\n\nCalica!",
+    "audio": "assets/audio/14.mp3"
   }
 ];
