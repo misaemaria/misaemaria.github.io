@@ -395,3 +395,7 @@ body.sheet-open { overflow: hidden; }
 }
 .pl-vol:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; }
 @media (max-width: 720px) { .pl-vol { display: none; } }
+
+/* O atributo hidden sempre esconde, mesmo em elementos com display próprio
+   (a janela da música usa display:flex e continuava na tela ao fechar). */
+[hidden] { display: none !important; }
