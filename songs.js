@@ -142,5 +142,14 @@ window.SONGS = [
     "videoFonte": "",
     "letra": "Vossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\n\nEu não vi do barro, não foi Deus quem me criou\nEu sou primo do mamaco, dinossauro predador\nNão vim de Adão e Eva porque incesto é nojento\nFui selecionado pela natureza e sou complexo\n\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\n\nVossorocaaa...\n\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\n\nEu não vi do barro, não foi Deus quem me criou\nEu sou primo do mamaco, dinossauro predador\nNão vim de Adão e Eva porque incesto é nojento\nFui selecionado pela natureza e sou complexo\n\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco",
     "audio": "assets/audio/16.mp3"
+  },
+  {
+    "id": 17,
+    "nome": "Jesus, Boulos e Marçal",
+    "compositor": "",
+    "descricao": "Uma pregadora durante um culta á altura das eleições municipais incitava o povo á não votar no Guilherme Boulos enquanto orava para que o Pablo Marçal vencesse.\n\n[Obs. Não encontrei o vídeo de origem]",
+    "videoFonte": "",
+    "letra": "Traga tua presença na vida do marçal\nPorque você pode tudo\nE aqueles que ainda não têm você\nComo o único salvador\nPelo amor de Deus, eu peço de joelho\nAjoelhada na bandeira\nEu tenho lutado contra o comunismo\n\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!\n\nQue você prove, que você mostre\nPra esse povo que não conhece você, Jesus\nQue o marçal vença o mal\nO inferno não vai acabar com a igreja\n\nSe esse Boulos entrar, ele vai determinar\n(Ele vai determinar, ele vai determinar)\nAjoelhada na bandeira\nEu tenho lutado contra o comunismo\n\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!\n\nQue você prove, que você mostre\nPra esse povo que não conhece você, Jesus\nQue o marçal vença o mal\nO inferno não vai acabar com a igreja\n\nSe esse Boulos entrar\nSe esse Boulos entrar\nNuma igreja\n\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!",
+    "audio": "assets/audio/17.mp3"
   }
 ];
