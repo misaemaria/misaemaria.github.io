@@ -160,5 +160,14 @@ window.SONGS = [
     "videoFonte": "",
     "letra": "Oh meu!\n\nHomens fortes de verdade\nSe reúnem toda sexta\nPra fumar tabaco e beber cerveja e louvar ao Senhor\nCom suas vozes graves\nMacho, até debaixo de outro..\nMacho, para cantar como um..\nMacho, e comer carne de macho\n\nHomens fortes de verdade\nQue não aceitam colacho\nBebem cerveja e fumam tabaco\nSão machos até debaixo de outro macho\nMacho, até debaixo de outro..\nMacho, para louvar como um..\nMacho, no banheiros com outros..\nMachos\n\n[Solo de guitarra]\n\nHomens fortes de verdade\nQue não aceitam colacho\nBebem cerveja e fumam tabaco\nSão machos até debaixo de outro macho\nMacho, até debaixo de outro..\nMacho, para louvar como um..\nMacho, no banheiros com outros..\nMachos\n\nMachos\nMachos\nOh machos",
     "audio": "assets/audio/18.mp3"
+  },
+  {
+    "id": 19,
+    "nome": "Você quer colher mangas?",
+    "compositor": "",
+    "descricao": "[Ainda sem lore e link do vídeo de origem]",
+    "videoFonte": "",
+    "letra": "A média peniana do Equador, é de 17 centímetros e meio\nIsso quer dizer que os caras têm 10% da altura deles em pingola\nPra que tudo isso, amigo, você quer colher mangas por acaso?\nPra que tudo isso, amigo, você quer colher mangas por acaso?\n\nMas no Nepal, a situação é complicada, a média nacional de pau é a menor do mundo\nSão apenas 9cm, lá no Nepal ninguém tem pau como no Equador\n\nPra que tudo isso, amigo, você quer colher mangas por acaso?\nPra que tudo isso, amigo, você quer colher mangas por acaso?\n\nMas no Nepal, a situação é complicada, a média nacional de pau é a menor do mundo\nSão apenas 9cm, lá no Nepal ninguém tem pau como no Equador\n\nPra que tudo isso, amigo, você quer colher mangas por acaso?\nPra que tudo isso, amigo, você quer colher mangas por acaso?\nPra que tudo isso, amigo, você quer colher mangas por acaso?\nPra que tudo isso, amigo, você quer colher mangas por acaso?",
+    "audio": "assets/audio/19.mp3"
   }
 ];
