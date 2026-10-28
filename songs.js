@@ -133,5 +133,14 @@ window.SONGS = [
     "videoFonte": "",
     "letra": "Que personagem da Bíblia você vestiria para o Halloween gospel?\nEu vestiria Adão porque ele adora comer uma maçã\nAoi, calica!\nEu seria o Joquebede por que adoro cuidar do meu bebê Bob Esponja\nAoi, calica!\nEu me vestiria de Eva porque ela adora comer uma maçã\nAii, calica!\nEu seria a Maria porque ela tem 14 anos e adora cuidar do filho dela, Jesus\nAoi, calica!\n\nAooh Calica... como eu estou solteiro, levaria Ester porque ela é muito linda, cara\nAooh Calica... acho que levaria Jesus porque ele ia aooh, dançar muito com a gente\nAooh Calica...!",
     "audio": "assets/audio/15.mp3"
+  },
+  {
+    "id": 16,
+    "nome": "Vossoroca, Primo do Filtro de Barro",
+    "compositor": "",
+    "descricao": "[Ainda sem lore e link do vídeo de origem]",
+    "videoFonte": "",
+    "letra": "Vossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\n\nEu não vi do barro, não foi Deus quem me criou\nEu sou primo do mamaco, dinossauro predador\nNão vim de Adão e Eva porque incesto é nojento\nFui selecionado pela natureza e sou complexo\n\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\n\nVossorocaaa...\n\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\n\nEu não vi do barro, não foi Deus quem me criou\nEu sou primo do mamaco, dinossauro predador\nNão vim de Adão e Eva porque incesto é nojento\nFui selecionado pela natureza e sou complexo\n\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco\nVossoroca, primo do filtro de barro\nNoi não é lama, é tropa dos mamaco",
+    "audio": "assets/audio/16.mp3"
   }
 ];
