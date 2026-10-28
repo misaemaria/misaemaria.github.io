@@ -65,6 +65,8 @@
         (song.videoFonte ? '<div class="field-label">Origem</div><a class="srclink" href="' + esc(song.videoFonte) + '" target="_blank" rel="noopener">▶ Ver o vídeo que gerou essa música</a>' : '') +
         '<div class="field-label">Letra</div>' +
         '<div class="lyrics">' + esc(song.letra || '') + '</div>' +
+        (global.LyricFix && global.LyricFix.available()
+          ? '<button type="button" class="fix-open">✎ Achou algo errado na letra? Sugerir correção</button>' : '') +
         ((prev || next) ? '<nav class="song-nav">' +
           (prev ? '<a class="prev" href="#" data-id="' + prev.id + '">← ' + esc(prev.nome || 'Sem título') + '</a>' : '') +
           (next ? '<a class="next" href="#" data-id="' + next.id + '">' + esc(next.nome || 'Sem título') + ' →</a>' : '') +
@@ -81,6 +83,8 @@
       e.currentTarget.setAttribute('aria-label', now ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
       onFavChange();
     });
+    var fixBtn = body.querySelector('.fix-open');
+    if (fixBtn) fixBtn.addEventListener('click', function () { global.LyricFix.open(song); });
     var playBtn = body.querySelector('.sheet-play');
     if (playBtn) {
       playBtn.addEventListener('click', function () {

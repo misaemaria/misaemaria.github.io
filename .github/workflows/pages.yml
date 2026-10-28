@@ -48,6 +48,17 @@ jobs:
       - name: Fetch latest YouTube videos
         run: python fetch_videos.py
 
+      # O Supabase grátis pausa o projeto depois de 7 dias sem acesso; esta
+      # consulta de hora em hora (devolve lista vazia, pelas regras RLS) evita isso.
+      - name: Keep Supabase awake
+        continue-on-error: true
+        run: |
+          URL=$(grep -oP "url:\s*'\K[^']+" supabase-config.js || true)
+          KEY=$(grep -oP "key:\s*'\K[^']+" supabase-config.js || true)
+          if [ -n "$URL" ] && [ -n "$KEY" ]; then
+            curl -fsS -o /dev/null -w "supabase: %{http_code}\n" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL/rest/v1/correcoes?select=id&limit=1"
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

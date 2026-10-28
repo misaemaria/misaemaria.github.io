@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import unicodedata
 from pathlib import Path
@@ -11,6 +12,9 @@ SONGS_PATH = ROOT / "songs.js"
 MUSICAS_DIR = ROOT / "musicas"
 INDEX_PATH = ROOT / "index.html"
 SITEMAP_PATH = ROOT / "sitemap.xml"
+# As páginas são geradas a cada deploy; o commit no ?v= faz o navegador
+# buscar o CSS/JS novo em vez de usar o que ficou em cache.
+ASSET_VERSION = (os.environ.get("GITHUB_SHA") or "dev")[:7]
 
 
 def slugify(value: str) -> str:
@@ -109,7 +113,7 @@ def render_page(song: dict, prev_song: dict | None, next_song: dict | None) -> s
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
   <meta name="theme-color" content="#1a1250">
-  <link rel="stylesheet" href="../style.css?v=6">
+  <link rel="stylesheet" href="../style.css?v={ASSET_VERSION}">
 </head>
 <body>
   <header class="top">
@@ -136,7 +140,8 @@ def render_page(song: dict, prev_song: dict | None, next_song: dict | None) -> s
       {source_html}
 
       <div class="field-label">Letra</div>
-      <div class="lyrics">{safe_lyrics}</div>
+      <div class="lyrics" id="songLyrics">{safe_lyrics}</div>
+      <button type="button" class="fix-open" id="fixOpenBtn" hidden>✎ Achou algo errado na letra? Sugerir correção</button>
 
       {song_nav_html}
     </article>
@@ -144,8 +149,24 @@ def render_page(song: dict, prev_song: dict | None, next_song: dict | None) -> s
 
   <script src="../favorites.js?v=1"></script>
   <script src="../views.js?v=1"></script>
+  <script src="../supabase-config.js?v={ASSET_VERSION}"></script>
+  <script src="../corrections.js?v={ASSET_VERSION}"></script>
   <script>
     if (window.Views) window.Views.hit({json.dumps(slug)});
+  </script>
+  <script>
+    (function () {{
+      var btn = document.getElementById('fixOpenBtn');
+      if (!btn || !window.LyricFix || !window.LyricFix.available()) return;
+      btn.hidden = false;
+      btn.addEventListener('click', function () {{
+        window.LyricFix.open({{
+          id: {json.dumps(song_id)},
+          nome: {json.dumps(title, ensure_ascii=False)},
+          letra: document.getElementById('songLyrics').textContent
+        }});
+      }});
+    }})();
   </script>
   <script>
     (function () {{

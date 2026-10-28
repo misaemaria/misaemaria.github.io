@@ -67,6 +67,25 @@
   #statusMsg.err { color: var(--danger); }
   .hint { font-size: 12px; color: var(--muted); margin-top: -8px; margin-bottom: 14px; }
   [hidden] { display: none !important; }
+
+  /* correções de letra */
+  .tab-badge { display: inline-block; min-width: 18px; padding: 1px 6px; margin-left: 4px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); font-size: 11px; text-align: center; }
+  .fix-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+  .fix-card .top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .fix-card .n { font-weight: 600; }
+  .fix-card .c { font-size: 12px; color: var(--muted); }
+  .fix-card .note { margin: 8px 0 0; font-size: 14px; white-space: pre-wrap; }
+  .fix-card .warn { margin: 8px 0 0; font-size: 12px; color: var(--accent); }
+  .diff { margin-top: 10px; max-height: 320px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; font: 13px/1.5 ui-monospace, Consolas, monospace; }
+  .diff div { padding: 0 10px; white-space: pre-wrap; }
+  .diff .del { background: rgba(226,87,76,.18); color: #f3a59e; text-decoration: line-through; }
+  .diff .add { background: rgba(76,175,80,.18); color: #a5dba8; }
+  .diff .same { color: var(--muted); }
+  .diff .gap { color: var(--muted); font-style: italic; }
+  .fix-card .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+  #fixToolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  #fixToolbar label { display: flex; align-items: center; gap: 8px; margin: 0; text-transform: none; letter-spacing: 0; font-size: 13px; }
+  #fixToolbar input { width: auto; }
 </style>
 </head>
 <body>
@@ -92,6 +111,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="tab-musicas">Músicas</button>
     <button class="tab-btn" data-tab="tab-insta">Instagram</button>
+    <button class="tab-btn" data-tab="tab-fix">Correções<span class="tab-badge" id="fixBadge" hidden></span></button>
     <button class="tab-btn" data-tab="tab-config">Configurações</button>
   </div>
 
@@ -116,6 +136,29 @@
     </div>
     <div id="instaList"></div>
   </div>
+  <div class="tab-panel" id="tab-fix">
+    <div class="panel-box" id="sbLoginBox" hidden>
+      <p class="hint" style="margin-top:0">Os pedidos de correção ficam no Supabase. Entra com o utilizador admin criado lá (Authentication → Users).</p>
+      <div class="field">
+        <label for="sbEmail">E-mail</label>
+        <input type="email" id="sbEmail" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="sbPw">Senha</label>
+        <input type="password" id="sbPw" autocomplete="current-password">
+      </div>
+      <div class="form-actions">
+        <button class="primary" id="sbLoginBtn">Entrar</button>
+      </div>
+    </div>
+    <div id="fixToolbar" hidden>
+      <button id="fixReloadBtn">↻ Recarregar</button>
+      <label><input type="checkbox" id="fixShowAll"> Mostrar também as resolvidas</label>
+      <button class="link" id="sbLogoutBtn">Sair do Supabase</button>
+    </div>
+    <div id="fixList"></div>
+  </div>
+
   <div class="tab-panel" id="tab-config">
     <div class="panel-box">
       <div class="field">
@@ -178,6 +221,7 @@
 </div>
 <div id="editBackdrop" hidden style="position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:40;"></div>
 
+<script src="../supabase-config.js"></script>
 <script>
 (function () {
   'use strict';
@@ -442,6 +486,7 @@
     editBackdrop.hidden = false;
   }
   function closeEdit() {
+    pendingFixId = null;
     editOverlay.hidden = true;
     editBackdrop.hidden = true;
   }
@@ -528,9 +573,14 @@
     var ok = await saveSongsFile('chore: ' + (isNew ? 'adicionar' : 'editar') + ' música "' + nome + '"');
     submitBtn.disabled = false; submitBtn.textContent = 'Guardar';
     if (ok) {
+      var fixId = pendingFixId;
       setStatus('Guardado.', 'ok');
       closeEdit();
       renderList();
+      if (fixId != null) {
+        var fx = fixes.find(function (x) { return x.id === fixId; });
+        if (fx) setFixStatus(fx, 'aplicada');
+      }
     } else {
       setStatus('Falha ao guardar. Recarrega e tenta de novo.', 'err');
     }
@@ -646,9 +696,232 @@
     saveInsta('chore: adicionar postagem do Instagram', prev);
   });
 
+  // ---- Correções de letra (Supabase) ----
+  // O site público só consegue INSERIR pedidos (regras RLS). Ler, aplicar e
+  // descartar exige o login do admin no Supabase; a sessão fica no navegador.
+  var SB = window.MISA_SUPABASE || {};
+  var SB_SESSION_KEY = 'sb_session';
+  var fixes = [];
+  // Quando a correção é aberta no editor, guardar a música marca o pedido como aplicado.
+  var pendingFixId = null;
+
+  function sbSession() {
+    try { return JSON.parse(localStorage.getItem(SB_SESSION_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function sbStore(data) {
+    localStorage.setItem(SB_SESSION_KEY, JSON.stringify({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: Date.now() + (data.expires_in || 3600) * 1000
+    }));
+  }
+  async function sbAuth(grant, body) {
+    var res = await fetchWithTimeout(SB.url + '/auth/v1/token?grant_type=' + grant, {
+      method: 'POST',
+      headers: { apikey: SB.key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) return null;
+    var data = await res.json();
+    sbStore(data);
+    return data.access_token;
+  }
+  async function sbToken() {
+    var s = sbSession();
+    if (!s) return null;
+    if (Date.now() < s.expires_at - 60000) return s.access_token;
+    var t = await sbAuth('refresh_token', { refresh_token: s.refresh_token }).catch(function () { return null; });
+    if (!t) localStorage.removeItem(SB_SESSION_KEY);
+    return t;
+  }
+  async function sbFetch(path, opts) {
+    var token = await sbToken();
+    if (!token) { showSbLogin(); throw new Error('sessão expirada'); }
+    var res = await fetchWithTimeout(SB.url + '/rest/v1/' + path, Object.assign({}, opts, {
+      headers: Object.assign({ apikey: SB.key, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, (opts && opts.headers) || {})
+    }));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  function showSbLogin() {
+    document.getElementById('sbLoginBox').hidden = false;
+    document.getElementById('fixToolbar').hidden = true;
+    document.getElementById('fixList').innerHTML = '';
+  }
+
+  document.getElementById('sbLoginBtn').addEventListener('click', async function () {
+    var email = document.getElementById('sbEmail').value.trim();
+    var pw = document.getElementById('sbPw').value;
+    setStatus('A entrar…');
+    var t = await sbAuth('password', { email: email, password: pw }).catch(function () { return null; });
+    if (!t) { setStatus('E-mail ou senha do Supabase incorretos.', 'err'); return; }
+    document.getElementById('sbPw').value = '';
+    setStatus('');
+    loadFixes();
+  });
+  document.getElementById('sbLogoutBtn').addEventListener('click', function () {
+    localStorage.removeItem(SB_SESSION_KEY);
+    document.getElementById('fixBadge').hidden = true;
+    showSbLogin();
+  });
+  document.getElementById('fixReloadBtn').addEventListener('click', function () { loadFixes(); });
+  document.getElementById('fixShowAll').addEventListener('change', renderFixes);
+
+  async function loadFixes() {
+    if (!SB.url || !SB.key) {
+      document.getElementById('fixList').innerHTML = '<p style="color:var(--muted)">Supabase ainda não configurado (supabase-config.js).</p>';
+      return;
+    }
+    if (!sbSession()) { showSbLogin(); return; }
+    try {
+      fixes = await sbFetch('correcoes?select=*&order=created_at.desc&limit=200');
+    } catch (e) {
+      if (sbSession()) setStatus('Falha ao carregar as correções: ' + e.message, 'err');
+      return;
+    }
+    document.getElementById('sbLoginBox').hidden = true;
+    document.getElementById('fixToolbar').hidden = false;
+    renderFixes();
+  }
+
+  // Diferença linha a linha (maior subsequência comum). Letras têm poucas
+  // centenas de linhas, então a tabela n×m é tranquila.
+  function lineDiff(a, b) {
+    var x = a.split('\n'), y = b.split('\n'), n = x.length, m = y.length, i, j;
+    var L = [];
+    for (i = 0; i <= n; i++) L.push(new Array(m + 1).fill(0));
+    for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--)
+      L[i][j] = x[i] === y[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    var out = [];
+    i = 0; j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { out.push(['same', x[i]]); i++; j++; }
+      else if (L[i + 1][j] >= L[i][j + 1]) out.push(['del', x[i++]]);
+      else out.push(['add', y[j++]]);
+    }
+    while (i < n) out.push(['del', x[i++]]);
+    while (j < m) out.push(['add', y[j++]]);
+    return out;
+  }
+
+  // Mostra só as linhas mudadas com 2 de contexto; o resto vira "…".
+  function renderDiff(el, a, b) {
+    var d = lineDiff(a, b);
+    if (!d.some(function (r) { return r[0] !== 'same'; })) { el.textContent = 'A letra não foi alterada (só comentário).'; return; }
+    var keep = d.map(function () { return false; });
+    d.forEach(function (row, k) {
+      if (row[0] === 'same') return;
+      for (var t = Math.max(0, k - 2); t <= Math.min(d.length - 1, k + 2); t++) keep[t] = true;
+    });
+    var skipped = false;
+    d.forEach(function (row, k) {
+      var div = document.createElement('div');
+      if (!keep[k]) {
+        if (skipped) return;
+        skipped = true;
+        div.className = 'gap'; div.textContent = '…';
+      } else {
+        skipped = false;
+        div.className = row[0];
+        div.textContent = (row[0] === 'add' ? '+ ' : row[0] === 'del' ? '− ' : '  ') + (row[1] || ' ');
+      }
+      el.appendChild(div);
+    });
+  }
+
+  var FIX_STATUS = { pendente: 'Pendente', aplicada: 'Aplicada', descartada: 'Descartada' };
+
+  function renderFixes() {
+    var el = document.getElementById('fixList');
+    var showAll = document.getElementById('fixShowAll').checked;
+    var pending = fixes.filter(function (f) { return f.status === 'pendente'; });
+    var badge = document.getElementById('fixBadge');
+    badge.textContent = pending.length;
+    badge.hidden = !pending.length;
+    if (document.getElementById('fixToolbar').hidden) return;
+    var list = showAll ? fixes : pending;
+    if (!list.length) {
+      el.innerHTML = '<p style="color:var(--muted)">' + (showAll ? 'Nenhum pedido ainda.' : 'Nenhum pedido pendente.') + '</p>';
+      return;
+    }
+    el.innerHTML = '';
+    list.forEach(function (f) {
+      var card = document.createElement('div');
+      card.className = 'fix-card';
+      card.innerHTML =
+        '<div class="top"><div><div class="n"></div><div class="c when"></div></div><div class="c st"></div></div>' +
+        '<p class="note" hidden></p><p class="warn" hidden></p><div class="diff"></div>' +
+        '<div class="actions"></div>';
+      card.querySelector('.n').textContent = f.song_nome;
+      card.querySelector('.when').textContent = new Date(f.created_at).toLocaleString('pt-PT') + (f.autor ? ' · ' + f.autor : '');
+      card.querySelector('.st').textContent = FIX_STATUS[f.status] || f.status;
+      if (f.comentario) { var note = card.querySelector('.note'); note.hidden = false; note.textContent = '“' + f.comentario + '”'; }
+
+      var song = songs.find(function (s) { return s.id === f.song_id; });
+      var warn = card.querySelector('.warn');
+      if (!song) { warn.hidden = false; warn.textContent = 'Esta música já não existe no site (ou as músicas ainda não carregaram).'; }
+      else if (f.status === 'pendente' && (song.letra || '') !== f.letra_original) {
+        warn.hidden = false;
+        warn.textContent = 'A letra mudou desde o pedido. A comparação abaixo é com a letra atual; aplicar substitui a letra inteira.';
+      }
+      renderDiff(card.querySelector('.diff'), song ? (song.letra || '') : f.letra_original, f.letra);
+
+      var actions = card.querySelector('.actions');
+      if (f.status === 'pendente') {
+        var discard = document.createElement('button');
+        discard.className = 'danger'; discard.textContent = 'Descartar';
+        discard.addEventListener('click', function () { setFixStatus(f, 'descartada'); });
+        actions.appendChild(discard);
+        if (song) {
+          var edit = document.createElement('button');
+          edit.textContent = 'Abrir no editor';
+          edit.title = 'Abre a música com a letra sugerida para ajustares antes de guardar';
+          edit.addEventListener('click', function () {
+            openEdit(song);
+            document.getElementById('f-letra').value = f.letra;
+            pendingFixId = f.id;
+          });
+          actions.appendChild(edit);
+          var apply = document.createElement('button');
+          apply.className = 'primary'; apply.textContent = 'Aplicar';
+          apply.addEventListener('click', function () { applyFix(f, song, apply); });
+          actions.appendChild(apply);
+        }
+      }
+      el.appendChild(card);
+    });
+  }
+
+  async function applyFix(f, song, btn) {
+    if (!confirmInline('Substituir a letra de "' + song.nome + '" pela sugerida?')) return;
+    btn.disabled = true;
+    setStatus('A aplicar…');
+    var prevSongs = songs;
+    songs = songs.map(function (s) { return s.id === song.id ? Object.assign({}, s, { letra: f.letra }) : s; });
+    var ok = await saveSongsFile('chore: corrigir letra de "' + song.nome + '" (sugestão de visitante)');
+    if (!ok) { songs = prevSongs; btn.disabled = false; setStatus('Falha ao guardar a letra: ' + lastGhError, 'err'); return; }
+    renderList();
+    await setFixStatus(f, 'aplicada');
+    setStatus('Letra corrigida. Aparece no site em 1–2 minutos.', 'ok');
+  }
+
+  async function setFixStatus(f, status) {
+    try {
+      await sbFetch('correcoes?id=eq.' + f.id, { method: 'PATCH', body: JSON.stringify({ status: status }), headers: { Prefer: 'return=minimal' } });
+      f.status = status;
+      renderFixes();
+      if (status === 'descartada') setStatus('Pedido descartado.', 'ok');
+    } catch (e) {
+      setStatus('Falha ao atualizar o pedido: ' + e.message, 'err');
+    }
+  }
+
   function initApp() {
     loadConfig();
-    if (ghUser && ghRepo && ghToken) { loadSongs(); loadInsta(); }
+    loadFixes();
+    if (ghUser && ghRepo && ghToken) { loadSongs().then(renderFixes); loadInsta(); }
     else setStatus('Configura o GitHub na aba "Configurações" primeiro.', 'err');
   }
 })();
