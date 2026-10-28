@@ -401,8 +401,11 @@ body.sheet-open { overflow: hidden; }
 [hidden] { display: none !important; }
 
 /* ---- sugerir correção da letra ---- */
+/* O botão fica na mesma linha do rótulo "Letra", alinhado à direita. */
+.lyrics-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.lyrics-head .field-label { margin-bottom: 0; }
 .fix-open {
-  margin-top: 14px; padding: 8px 12px; border: 1px dashed var(--border); border-radius: 10px; cursor: pointer;
+  padding: 5px 10px; border: 1px dashed var(--border); border-radius: 10px; cursor: pointer;
   background: transparent; color: var(--muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em;
 }
 .fix-open:hover { color: var(--yellow); border-color: var(--yellow); }

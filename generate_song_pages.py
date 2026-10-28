@@ -139,9 +139,11 @@ def render_page(song: dict, prev_song: dict | None, next_song: dict | None) -> s
 
       {source_html}
 
-      <div class="field-label">Letra</div>
+      <div class="lyrics-head">
+        <div class="field-label">Letra</div>
+        <button type="button" class="fix-open" id="fixOpenBtn" hidden>✎ Algo errado? Sugerir correção</button>
+      </div>
       <div class="lyrics" id="songLyrics">{safe_lyrics}</div>
-      <button type="button" class="fix-open" id="fixOpenBtn" hidden>✎ Achou algo errado na letra? Sugerir correção</button>
 
       {song_nav_html}
     </article>
