@@ -124,5 +124,14 @@ window.SONGS = [
     "videoFonte": "",
     "letra": "Que personagem da Bíblia você levaria para a festa das cores?\nEu levaria Pedro porque ele adora causar uma confusão\nAooh Calica... como eu estou solteiro, levaria Ester porque ela é muito linda, cara\nAooh Calica... acho que levaria Jesus porque ele ia aooh, dançar muito com a gente\nAooh Calica... Mirian, porque ela dançou na presença de aooh Calica...\nDavi, porque ele ia pegar aqui, balançar e jogar em todo mundo!\nAooh Calica...\n\nQue personagem da Bíblia você levaria para a festa das cores?\nEu levaria Pedro porque ele adora causar uma confusão\nAiooh Calica... \n\nComo eu estou solteiro, levaria Ester porque ela é muito linda, cara (ai ela é muito linda, cara!)\nAooh Calica... acho que levaria Jesus porque ele ia aooh, dançar muito com a gente (com a gente, com a gente)\nAooh Calica... Mirian, porque ela dançou na presença de... aaaaaooh Calica...\nDavi, porque ele ia pegar aqui, balançar e jogar em todo mundo!\nAi em todo mundo!\n\nCalica!",
     "audio": "assets/audio/14.mp3"
+  },
+  {
+    "id": 15,
+    "nome": "Halloween Gospel",
+    "compositor": "",
+    "descricao": "[Ainda sem lore e link do vídeo de origem]",
+    "videoFonte": "",
+    "letra": "Que personagem da Bíblia você vestiria para o Halloween gospel?\nEu vestiria Adão porque ele adora comer uma maçã\nAoi, calica!\nEu seria o Joquebede por que adoro cuidar do meu bebê Bob Esponja\nAoi, calica!\nEu me vestiria de Eva porque ela adora comer uma maçã\nAii, calica!\nEu seria a Maria porque ela tem 14 anos e adora cuidar do filho dela, Jesus\nAoi, calica!\n\nAooh Calica... como eu estou solteiro, levaria Ester porque ela é muito linda, cara\nAooh Calica... acho que levaria Jesus porque ele ia aooh, dançar muito com a gente\nAooh Calica...!",
+    "audio": "assets/audio/15.mp3"
   }
 ];
