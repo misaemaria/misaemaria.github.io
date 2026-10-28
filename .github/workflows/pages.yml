@@ -56,7 +56,7 @@ jobs:
           URL=$(grep -oP "url:\s*'\K[^']+" supabase-config.js || true)
           KEY=$(grep -oP "key:\s*'\K[^']+" supabase-config.js || true)
           if [ -n "$URL" ] && [ -n "$KEY" ]; then
-            curl -fsS -o /dev/null -w "supabase: %{http_code}\n" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL/rest/v1/correcoes?select=id&limit=1"
+            curl -fsS -o /dev/null -w "supabase: %{http_code}\n" -H "apikey: $KEY" "$URL/rest/v1/correcoes?select=id&limit=1"
           fi
 
       - name: Setup Pages

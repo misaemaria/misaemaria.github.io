@@ -15,7 +15,8 @@
   }
 
   function headers(c) {
-    return { apikey: c.key, Authorization: 'Bearer ' + c.key, 'Content-Type': 'application/json' };
+    // Só apikey: serve tanto para a chave anon antiga quanto para a publishable nova.
+    return { apikey: c.key, 'Content-Type': 'application/json' };
   }
 
   // Uma consulta leve por visita, para o projeto grátis do Supabase não
