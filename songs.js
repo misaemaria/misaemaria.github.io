@@ -151,5 +151,14 @@ window.SONGS = [
     "videoFonte": "",
     "letra": "Traga tua presença na vida do marçal\nPorque você pode tudo\nE aqueles que ainda não têm você\nComo o único salvador\nPelo amor de Deus, eu peço de joelho\nAjoelhada na bandeira\nEu tenho lutado contra o comunismo\n\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!\n\nQue você prove, que você mostre\nPra esse povo que não conhece você, Jesus\nQue o marçal vença o mal\nO inferno não vai acabar com a igreja\n\nSe esse Boulos entrar, ele vai determinar\n(Ele vai determinar, ele vai determinar)\nAjoelhada na bandeira\nEu tenho lutado contra o comunismo\n\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!\n\nQue você prove, que você mostre\nPra esse povo que não conhece você, Jesus\nQue o marçal vença o mal\nO inferno não vai acabar com a igreja\n\nSe esse Boulos entrar\nSe esse Boulos entrar\nNuma igreja\n\nSe esse Boulos entrar\nEle vai determinar\nA polícia de São Paulo acabou!",
     "audio": "assets/audio/17.mp3"
+  },
+  {
+    "id": 18,
+    "nome": "Macho, até debaixo de outro macho",
+    "compositor": "",
+    "descricao": "[Ainda sem lore e link do vídeo de origem]",
+    "videoFonte": "",
+    "letra": "Oh meu!\n\nHomens fortes de verdade\nSe reúnem toda sexta\nPra fumar tabaco e beber cerveja e louvar ao Senhor\nCom suas vozes graves\nMacho, até debaixo de outro..\nMacho, para cantar como um..\nMacho, e comer carne de macho\n\nHomens fortes de verdade\nQue não aceitam colacho\nBebem cerveja e fumam tabaco\nSão machos até debaixo de outro macho\nMacho, até debaixo de outro..\nMacho, para louvar como um..\nMacho, no banheiros com outros..\nMachos\n\n[Solo de guitarra]\n\nHomens fortes de verdade\nQue não aceitam colacho\nBebem cerveja e fumam tabaco\nSão machos até debaixo de outro macho\nMacho, até debaixo de outro..\nMacho, para louvar como um..\nMacho, no banheiros com outros..\nMachos\n\nMachos\nMachos\nOh machos",
+    "audio": "assets/audio/18.mp3"
   }
 ];
